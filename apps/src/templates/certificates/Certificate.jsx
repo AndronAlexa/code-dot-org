@@ -246,12 +246,20 @@ function Certificate(props) {
           </swiper-container>
           <button
             id="certificate-swiper-prev-el"
-            className={classNames(style.navButton, style.prevElNav)}
+            className={classNames(
+              style.navButton,
+              style.prevElNav,
+              style.certificatePrevElNav
+            )}
             type="button"
           />
           <button
             id="certificate-swiper-next-el"
-            className={classNames(style.navButton, style.nextElNav)}
+            className={classNames(
+              style.navButton,
+              style.nextElNav,
+              style.certificateNextElNav
+            )}
             type="button"
           />
         </div>
