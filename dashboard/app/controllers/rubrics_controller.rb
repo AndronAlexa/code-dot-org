@@ -292,6 +292,9 @@ class RubricsController < ApplicationController
   end
 
   def update_ai_rubrics_tour_seen
+    puts "update_ai_rubrics_tour_seen sleeping at #{Time.now}"
+    sleep 5
+    puts "update_ai_rubrics_tour_seen awake at #{Time.now}"
     return head :unauthorized unless current_user&.teacher?
     seen = params.require(:seen)
     current_user.ai_rubrics_tour_seen = seen
