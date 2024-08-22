@@ -67,6 +67,9 @@ export default function RubricContainer({
   const [feedbackAdded, setFeedbackAdded] = useState(false);
 
   const [productTour, setProductTour] = useState(false);
+
+  console.log('rendering RubricContainer. productTour:', productTour);
+
   const tourStep = useRef(null);
   const tourRestarted = useRef(false);
 
@@ -138,26 +141,38 @@ export default function RubricContainer({
   // add more functionality to the settings tab.
   const showSettings = onLevelForEvaluation && teacherHasEnabledAi;
 
-  const updateTourStatus = useCallback(() => {
-    const bodyData = JSON.stringify({seen: productTour});
-    const rubricId = rubric.id;
-    const url = `/rubrics/${rubricId}/update_ai_rubrics_tour_seen`;
-    HttpClient.post(url, bodyData, true, {
-      'Content-Type': 'application/json',
-    })
-      .then(response => {
-        return response.json();
+  const updateTourStatus = useCallback(
+    sourceId => {
+      console.log(
+        `updateTourStatus called by ${sourceId}. productTour:`,
+        productTour
+      );
+      // productTour: true --> seen: true
+      const bodyData = JSON.stringify({seen: productTour});
+      const rubricId = rubric.id;
+      const url = `/rubrics/${rubricId}/update_ai_rubrics_tour_seen`;
+      HttpClient.post(url, bodyData, true, {
+        'Content-Type': 'application/json',
       })
-      .then(json => {
-        if (json['seen']) {
-          setProductTour(false);
-        } else {
-          setProductTour(true);
-        }
-      });
-  }, [rubric.id, productTour]);
+        .then(response => {
+          return response.json();
+        })
+        .then(json => {
+          if (json['seen']) {
+            // seen: true --> productTour: false --> tour not visible
+            console.log(`updateTourStatus ${sourceId} setProductTour false`);
+            setProductTour(false);
+          } else {
+            console.log(`updateTourStatus ${sourceId} setProductTour true`);
+            setProductTour(true);
+          }
+        });
+    },
+    [rubric.id, productTour]
+  );
 
   const getTourStatus = useCallback(() => {
+    console.log('getTourStatus called');
     const rubricId = rubric.id;
     const url = `/rubrics/${rubricId}/get_ai_rubrics_tour_seen`;
     fetch(url)
@@ -166,8 +181,10 @@ export default function RubricContainer({
       })
       .then(json => {
         if (json['seen']) {
+          console.log('getTourStatus setProductTour false');
           setProductTour(false);
         } else {
+          console.log('getTourStatus setProductTour true');
           setProductTour(true);
         }
       });
@@ -179,7 +196,7 @@ export default function RubricContainer({
 
   const tourRestartHandler = () => {
     tourRestarted.current = true;
-    updateTourStatus();
+    updateTourStatus('tourRestartHandler');
     analyticsReporter.sendEvent(EVENTS.TA_RUBRIC_TOUR_RESTARTED, {
       ...(reportingData || {}),
     });
@@ -197,7 +214,7 @@ export default function RubricContainer({
   };
 
   const onTourExit = stepIndex => {
-    updateTourStatus();
+    updateTourStatus('onTourExit');
     analyticsReporter.sendEvent(EVENTS.TA_RUBRIC_TOUR_CLOSED, {
       ...(reportingData || {}),
       step: stepIndex,
@@ -205,7 +222,7 @@ export default function RubricContainer({
   };
 
   const onTourComplete = () => {
-    updateTourStatus();
+    updateTourStatus('onTourComplete');
     analyticsReporter.sendEvent(EVENTS.TA_RUBRIC_TOUR_COMPLETE, {
       ...(reportingData || {}),
     });
