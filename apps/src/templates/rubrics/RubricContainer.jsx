@@ -150,7 +150,7 @@ export default function RubricContainer({
       );
       setProductTour(false);
 
-      const bodyData = JSON.stringify({seen: false});
+      const bodyData = JSON.stringify({seen: true});
       const rubricId = rubric.id;
       const url = `/rubrics/${rubricId}/update_ai_rubrics_tour_seen`;
       HttpClient.post(url, bodyData, true, {
