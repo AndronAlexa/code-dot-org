@@ -145,10 +145,12 @@ export default function RubricContainer({
     sourceId => {
       console.log(
         `updateTourStatus called by ${sourceId}. productTour:`,
-        productTour
+        productTour,
+        'setProductTour: false'
       );
-      // productTour: true --> seen: true
-      const bodyData = JSON.stringify({seen: productTour});
+      setProductTour(false);
+
+      const bodyData = JSON.stringify({seen: false});
       const rubricId = rubric.id;
       const url = `/rubrics/${rubricId}/update_ai_rubrics_tour_seen`;
       HttpClient.post(url, bodyData, true, {
@@ -158,14 +160,7 @@ export default function RubricContainer({
           return response.json();
         })
         .then(json => {
-          if (json['seen']) {
-            // seen: true --> productTour: false --> tour not visible
-            console.log(`updateTourStatus ${sourceId} setProductTour false`);
-            setProductTour(false);
-          } else {
-            console.log(`updateTourStatus ${sourceId} setProductTour true`);
-            setProductTour(true);
-          }
+          console.log(`updateTourStatus ${sourceId} response:`, json);
         });
     },
     [rubric.id, productTour]
