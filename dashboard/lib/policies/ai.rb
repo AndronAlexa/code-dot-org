@@ -47,7 +47,7 @@ class Policies::Ai
     # Must be a teacher
     return false unless user.teacher?
 
-    # An individual opt-out can be supplied here if implemented
+    # Note: An individual opt-out can be supplied here if implemented
     true
   end
 
